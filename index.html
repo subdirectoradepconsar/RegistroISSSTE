@@ -395,6 +395,10 @@
       const btnText = document.getElementById('btn-text');
       const btnSpinner = document.getElementById('btn-spinner');
       const resetBtn = document.getElementById('reset-btn');
+      const sendError = document.createElement('p');
+      sendError.className = 'hidden mt-4 text-sm text-red-300';
+      sendError.setAttribute('role', 'alert');
+      form.appendChild(sendError);
 
       // Campos de Entrada
       const fullnameInput = document.getElementById('fullname');
@@ -454,6 +458,8 @@
         e.preventDefault();
 
         // Limpiar errores previos
+        if (submitBtn.disabled) return;
+        sendError.classList.add('hidden');
         let isValid = true;
         [fullnameError, emailError, genderError, birthyearError].forEach(el => el.classList.add('hidden'));
 
@@ -508,20 +514,31 @@
 
         const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyhrmMDiFQh8UFRH1_1fXhRapZOfFdYq5z28eyMgo4sWgEPzRZBelp8_DdPweCnkpIi/exec';
 
-        // Envío asíncrono en segundo plano (non-blocking / fetch)
-        fetch(WEBHOOK_URL, {
+        // Confirmar el guardado antes de mostrar éxito.
+        try {
+          const response = await fetch(WEBHOOK_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'text/plain;charset=utf-8'
           },
           body: JSON.stringify(payload)
-        }).then(response => {
-          console.log('Envío en segundo plano completado con éxito:', response);
-        }).catch(error => {
-          console.error('Error en envío en segundo plano:', error);
-        });
+          });
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          const result = await response.json();
+          if (result.status !== 'success') {
+            throw new Error(result.message || 'No se confirmó el guardado');
+          }
+        } catch (error) {
+          console.error('No se pudo confirmar el registro:', error);
+          sendError.textContent = 'No pudimos confirmar que tu registro se haya guardado. Conservamos tus datos; verifica tu conexión y consulta al personal antes de volver a enviarlo.';
+          sendError.classList.remove('hidden');
+          submitBtn.disabled = false;
+          btnText.classList.remove('hidden');
+          btnSpinner.classList.add('hidden');
+          return;
+        }
 
-        // Transición e interfaz inmediata al usuario sin congelar la pantalla
+        // Mostrar la confirmación recibida del servidor.
         setTimeout(() => {
           // Restaurar botón
           submitBtn.disabled = false;
