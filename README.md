@@ -1,14 +1,13 @@
 # Registro ISSSTE
 
-Registro de asistencia independiente, con nombre, correo, género y año de nacimiento. No solicita teléfono.
+Registro de asistencia con nombre, correo, género y año de nacimiento. No solicita teléfono.
 
-## Conexión pendiente
+Hoja de destino: https://docs.google.com/spreadsheets/d/17_VRYMmUkFfsENOKJleESWdLyeLIvN2bmk-iF8oI-Gs/edit
 
-1. Definir la nueva hoja con columnas: Fecha y hora, Nombre, Correo, Género, Año de nacimiento.
-2. Sustituir PENDIENTE_ID_HOJA_ISSSTE en apps-script/Code.gs por el ID de la nueva hoja.
-3. Implementar ese código en un proyecto de Apps Script propio de ISSSTE.
-4. Configurar WEBHOOK_URL en index.html con la URL /exec de esa implementación.
+## Activación pendiente
 
-Mientras WEBHOOK_URL esté vacío, el formulario no envía datos. El código escribe en la primera pestaña de la hoja y confirma el guardado antes de mostrar éxito.
+El código apps-script/Code.gs ya apunta a la nueva hoja. Copiarlo en el proyecto de Apps Script de ISSSTE e implementarlo como aplicación web. Después configurar WEBHOOK_URL en index.html con su dirección /exec.
 
-El banner S1.png fue proporcionado para este proyecto y conserva el texto “Encuesta de satisfacción”.
+Mientras WEBHOOK_URL esté vacío, el formulario no envía datos. La hoja debe tener en su primera pestaña las columnas: Fecha y hora, Nombre, Correo, Género, Año de nacimiento.
+
+El sitio confirma el registro únicamente tras recibir status: success de Apps Script.
